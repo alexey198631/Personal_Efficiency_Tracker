@@ -8,6 +8,10 @@ The goal of this project is to create a tool for enhancing personal efficiency b
 
 This data was initially stored locally in an Excel file, but has recently been migrated to Google Sheets. The first phase of the project aims to extract the most recent data from Google Sheets and merge it with the archived data stored locally in the Excel file. Subsequent stages will involve processing this information and preparing it for visualization in the form of various charts to monitor the dynamics of different metrics.
 
+## Phase 0: Conversion of Excel-based Daily Journal to SQLite3 Database
+
+The existing Excel journal comprises multiple sheets, each capturing distinct aspects of daily life. While Excel has been effective for manual entries, the need for more efficient data processing and analysis necessitates a shift to a database system.
+
 ## Phase 1: Data Extraction and Merging
 
 In the first phase of the project, we will focus on:
