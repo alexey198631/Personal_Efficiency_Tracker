@@ -95,6 +95,11 @@ CREATE TABLE IF NOT EXISTS Events (
     Event_Name TEXT,
     Event_Sphere TEXT,
     Day_ID INTEGER,
+    Is_Key_Week BOOLEAN DEFAULT 0,
+    Is_Key_Month BOOLEAN DEFAULT 0,
+    Is_Key_Season BOOLEAN DEFAULT 0,
+    Is_Key_Half_Year BOOLEAN DEFAULT 0,
+    Is_Key_Year BOOLEAN DEFAULT 0,
     FOREIGN KEY(Day_ID) REFERENCES Days(Day_ID)
 )
 ''')
