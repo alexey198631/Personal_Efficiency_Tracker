@@ -104,6 +104,37 @@ CREATE TABLE IF NOT EXISTS Events (
 )
 ''')
 
+# Create the Languages table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Languages (
+    Language_ID INTEGER PRIMARY KEY,
+    Language_Name TEXT UNIQUE
+)
+''')
+
+# Create the Activities table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Activities (
+    Activity_ID INTEGER PRIMARY KEY,
+    Activity_Name TEXT UNIQUE
+)
+''')
+
+# Create the LanguageLearning table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS LanguageLearning (
+    LL_ID INTEGER PRIMARY KEY,
+    Day_ID INTEGER,
+    Language_ID INTEGER,
+    Activity_ID INTEGER,
+    Duration INTEGER,
+    Notes TEXT,
+    FOREIGN KEY(Day_ID) REFERENCES Days(Day_ID),
+    FOREIGN KEY(Language_ID) REFERENCES Languages(Language_ID),
+    FOREIGN KEY(Activity_ID) REFERENCES Activities(Activity_ID)
+)
+''')
+
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
