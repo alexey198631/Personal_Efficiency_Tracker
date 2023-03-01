@@ -135,6 +135,70 @@ CREATE TABLE IF NOT EXISTS LanguageLearning (
 )
 ''')
 
+# Create the DailyMetrics table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS DailyMetrics (
+    Metric_ID INTEGER PRIMARY KEY,
+    Day_ID INTEGER,
+    DEND TIME,
+    DSTART TIME,
+    REGIME REAL,
+    SLEEP REAL,
+    VISUALIZATION INTEGER,
+    AFFUSION INTEGER,
+    MK INTEGER,
+    PT INTEGER,
+    ALW INTEGER,
+    PNW INTEGER,
+    MEDITATION INTEGER,
+    BREATH INTEGER,
+    MORNING INTEGER,
+    SPORT INTEGER,
+    SPORT_TIME INTEGER,
+    PL1 TEXT,
+    PL2 TEXT,
+    OUTSIDE INTEGER,
+    EYES INTEGER,
+    PUSH_UPS INTEGER,
+    PULL_UPS INTEGER,
+    SKID INTEGER,
+    SQUATING INTEGER,
+    ABS INTEGER,
+    PLANK INTEGER,
+    WATER INTEGER,
+    RUN REAL,
+    CYCLE REAL,
+    WALK REAL,
+    GOALS REAL,
+    DUMBBELLS INTEGER,
+    BAC INTEGER,
+    WINE INTEGER,
+    STRONG INTEGER,
+    FASTFOOD INTEGER,
+    SWEETS INTEGER,
+    COFFEE INTEGER,
+    FOREIGN KEY(Day_ID) REFERENCES Days(Day_ID)
+)
+''')
+
+# Create the WorkActivities table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS WorkActivities (
+    Work_ID INTEGER PRIMARY KEY,
+    Day_ID INTEGER,
+    Python INTEGER,
+    IQ INTEGER,
+    Prof INTEGER,
+    Prior INTEGER,
+    Plans INTEGER,
+    Meets INTEGER,
+    Difficult INTEGER,
+    Routine INTEGER,
+    Paid_work INTEGER,
+    FOREIGN KEY(Day_ID) REFERENCES Days(Day_ID)
+)
+''')
+
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
