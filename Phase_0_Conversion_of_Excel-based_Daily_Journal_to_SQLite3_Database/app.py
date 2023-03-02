@@ -199,6 +199,31 @@ CREATE TABLE IF NOT EXISTS WorkActivities (
 )
 ''')
 
+# Create the Art table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Art (
+    Art_ID INTEGER PRIMARY KEY,
+    Day_ID INTEGER,
+    START DATE,
+    DATE DATE,
+    TYPE TEXT,
+    AWARD TEXT,
+    LANG TEXT,
+    TIMES TEXT,
+    NAME TEXT,
+    YEAR INTEGER,
+    SIZE INTEGER,
+    TIME_SPENT INTEGER,
+    PTS INTEGER,
+    ACTIVITY TEXT,
+    CREATOR TEXT,
+    WHERE TEXT,
+    COUNTRY TEXT,
+    COMMENTS TEXT,
+    FOREIGN KEY(Day_ID) REFERENCES Days(Day_ID)
+)
+''')
+
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
