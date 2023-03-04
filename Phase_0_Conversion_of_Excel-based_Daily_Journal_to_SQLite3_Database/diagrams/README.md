@@ -18,30 +18,43 @@
 
 #### Weeks Table:
 `Week_ID` (Primary Key): A unique identifier for each week.
-`Week_Number`: The number of the week.
+`Week_Name`: Name of the week
+`Week_Sphere`: Week event sphere
 
 #### Month Table:
 `Month_ID` (Primary Key): A unique identifier for each month.
-`Month_Name`: The name of the month (e.g., January).
 `Month_Number`: The number of the month (e.g., 1 for January).
+`Month_Name`: The name of the month.
+`Month_Sphere`: Month event sphere
 
 #### Seasons Table:
 `Season_ID` (Primary Key): A unique identifier for each season.
+`Season_Number`: Name and number of a season (e.g. 37 Summer)
 `Season_Name`: The name of the season (e.g., Winter).
+`Season_Sphere`: Season event sphere
 
 #### Half_Years Table:
 `Half_Year_ID` (Primary Key): A unique identifier for each half-year.
 `Half_Year_Number`: The number of the half-year (e.g., 1 for the first half).
+`Half_Year_Name`: Key event of the half-year
+`Half_Year_Sphere`: Sphere of the key event of the half-year
 
 #### Years Table:
 `Year_ID` (Primary Key): A unique identifier for each year.
 `Year_Number`: The actual year (e.g., 1986).
+`Year_Name`: Key event of the year
+`Year_Sphere`: Sphere of the key event of the year
 
 #### Events Table:
 `Event_ID` (Primary Key): A unique identifier for each event.
 `Event_Name`: The name or description of the event.
 `Event_Sphere`: The sphere of the event.
 `Day_ID` (Foreign Key): Links to the Days table. This will allow you to determine the week, month, season, half-year, and year of the event through the Days table.
+`Place_of_Week_Event`: The best events place
+`Place_of_Month_Event`: The best events place
+`Place_of_Season_Event`: The best events place
+`Place_of_Half_Year_Event`: The best events place
+`Place_of_Year_Event`: The best events place
 
 ### Relationships:
 
