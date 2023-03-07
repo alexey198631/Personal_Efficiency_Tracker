@@ -1,5 +1,8 @@
 import sqlite3
+import pandas as pd
+import openpyxl
 from datetime import date, timedelta
+from utils.config import dairy_file_path
 
 # Connect to the database
 conn = sqlite3.connect('data_files/Days.db')
@@ -83,3 +86,48 @@ conn.commit()
 conn.close()
 
 print("Rows added successfully to the Days table!")
+
+
+# Load the Days Diary xlsx workbook
+workbook = openpyxl.load_workbook(dairy_file_path)
+
+# Select the sheet you want to modify
+sheet = workbook['days']
+
+# Save data frame from sheet data
+data_days = sheet.values
+cols = next(data_days)[0:]
+df_days = pd.DataFrame(data_days, columns=cols)
+
+# To get Day_Name, it is necessary to use type 'D'
+df_days = df_days[df_days['Type'] == 'D'].loc[:, :'SPHERE']
+# filter Days without Name
+df_days = df_days[df_days['EVENT'] != 'День ']
+
+print('Data from Dairy was imported!')
+
+# Connect to the database
+conn = sqlite3.connect('data_files/Days.db')
+cursor = conn.cursor()
+
+# Iterate over the rows of the DataFrame
+for _, row in df_days.iterrows():
+    # Extract values from the DataFrame row
+    date_value = row['DATE']
+    date_value = date_value.strftime('%d/%m/%Y')
+    day_name = row['EVENT']
+    day_sphere = row['SPHERE']
+    day_rating = row['POINTS']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Days
+    SET Day_Name = ?, Day_Sphere = ?, Day_Rating = ?
+    WHERE Date = ?
+    ''', (day_name, day_sphere, day_rating, date_value))
+
+print('All rows were updated!')
+
+# Commit the changes and close the connection
+conn.commit()
+conn.close()
