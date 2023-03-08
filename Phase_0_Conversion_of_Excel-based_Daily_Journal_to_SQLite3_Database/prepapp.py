@@ -99,12 +99,81 @@ data_days = sheet.values
 cols = next(data_days)[0:]
 df_days = pd.DataFrame(data_days, columns=cols)
 
-# To get Day_Name, it is necessary to use type 'D'
-df_days = df_days[df_days['Type'] == 'D'].loc[:, :'SPHERE']
-# filter Days without Name
-df_days = df_days[df_days['EVENT'] != 'День ']
-
 print('Data from Dairy was imported!')
+
+# To get Day_Name, it is necessary to use type 'D'
+df_day = df_days[df_days['Type'] == 'W'].loc[:, :'SPHERE']
+# filter Days without Name
+df_day = df_day[df_days['EVENT'] != 'День ']
+
+print('df for days is ready!')
+
+# To get Week_Name, it is necessary to use type 'W'
+df_weeks = df_days[df_days['Type'] == 'W'].loc[:, :'SPHERE']
+# filter Weeks without Name
+df_weeks = df_weeks[df_weeks['EVENT'] != 'Неделя ']
+# Extract the integer part and update the column
+df_weeks['DATE'] = df_weeks['DATE'].str.extract('(\d+)').astype(int)
+
+print('df for weeks is ready!')
+
+# To get Month_Name, it is necessary to use type 'M'
+df_months = df_days[df_days['Type'] == 'M'].loc[:, :'SPHERE']
+# filter Months without Name
+df_months = df_months[df_months['EVENT'] != 'Месяц ']
+# Extract the integer part and update the column
+df_months['DATE'] = df_months['DATE'].str.extract('\((\d+)\)').astype(int)
+
+print('df for months is ready!')
+
+seasons = {'зима': 'winter_', 'лето': 'summer_', 'осень': 'autumn_', 'весна': 'spring_'}
+
+# To get Season_Name, it is necessary to use type 'S'
+df_seasons = df_days[df_days['Type'] == 'S'].loc[:, :'SPHERE']
+# filter Season without Name
+df_seasons = df_seasons[df_seasons['EVENT'] != 'Сезон ']
+# Function to transform the string
+def transform_string(s):
+    for key, value in seasons.items():
+        if key in s:
+            return value + s.replace(key, '').strip()
+
+# Apply the transformation
+df_seasons['DATE'] = df_seasons['DATE'].apply(transform_string)
+
+print('df for seasons is ready!')
+
+# Dictionary to map Russian Half Year to English
+half_year = {'полугодие i': 'first_half_', 'полулетие i': 'first_half_', 'полугодие 2': 'second_half_', 'полулетие 2': 'second_half_'}
+
+# To get Half_Year_Name, it is necessary to use type 'HY'
+df_half_year = df_days[df_days['Type'] == 'HY'].loc[:, :'SPHERE']
+# filter Half-Year without Name
+df_half_year = df_half_year[df_half_year['EVENT'] != 'Полулетие ']
+df_half_year['DATE'] = df_half_year['DATE'].str.replace('II', '2')
+df_half_year['DATE'] = df_half_year['DATE'].str.lower().str.strip()
+# Function to transform the string
+def transform_string(s):
+    for key, value in half_year.items():
+        if key in s:
+            return value + s.replace(key, '').strip()
+
+# Apply the transformation
+df_half_year['DATE'] = df_half_year['DATE'].apply(transform_string)
+
+print('df for half years is ready!')
+
+
+# To get Year_Name, it is necessary to use type 'Y'
+df_year = df_days[df_days['Type'] == 'Y'].loc[:, :'SPHERE']
+# filter Year without Name
+df_year = df_year[df_year['EVENT'] != 'Летие ']
+# Extract the integer part and update the column
+df_year['DATE'] = df_year['DATE'].str.extract('(\d+)').astype(int)
+
+print('df for years is ready!')
+print('All data frames are ready!')
+
 
 # Connect to the database
 conn = sqlite3.connect('data_files/Days.db')
