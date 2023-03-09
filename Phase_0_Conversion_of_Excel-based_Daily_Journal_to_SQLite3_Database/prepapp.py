@@ -102,7 +102,7 @@ df_days = pd.DataFrame(data_days, columns=cols)
 print('Data from Dairy was imported!')
 
 # To get Day_Name, it is necessary to use type 'D'
-df_day = df_days[df_days['Type'] == 'W'].loc[:, :'SPHERE']
+df_day = df_days[df_days['Type'] == 'D'].loc[:, :'SPHERE']
 # filter Days without Name
 df_day = df_day[df_days['EVENT'] != 'День ']
 
@@ -122,7 +122,7 @@ df_months = df_days[df_days['Type'] == 'M'].loc[:, :'SPHERE']
 # filter Months without Name
 df_months = df_months[df_months['EVENT'] != 'Месяц ']
 # Extract the integer part and update the column
-df_months['DATE'] = df_months['DATE'].str.extract('\((\d+)\)').astype(int)
+df_months['DATE'] = df_months['DATE'].str.extract('\((.+)\)').astype(int)
 
 print('df for months is ready!')
 
@@ -180,7 +180,7 @@ conn = sqlite3.connect('data_files/Days.db')
 cursor = conn.cursor()
 
 # Iterate over the rows of the DataFrame
-for _, row in df_days.iterrows():
+for _, row in df_day.iterrows():
     # Extract values from the DataFrame row
     date_value = row['DATE']
     date_value = date_value.strftime('%d/%m/%Y')
@@ -191,6 +191,22 @@ for _, row in df_days.iterrows():
     # Update the SQLite database Days table
     cursor.execute('''
     UPDATE Days
+    SET Day_Name = ?, Day_Sphere = ?, Day_Rating = ?
+    WHERE Date = ?
+    ''', (day_name, day_sphere, day_rating, date_value))
+
+print('Days rows were updated!')
+
+# Iterate over the rows of the DataFrame
+for _, row in df_weeks.iterrows():
+    # Extract values from the DataFrame row
+    id_value = row['DATE']
+    week_name = row['EVENT']
+    weeks_sphere = row['SPHERE']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Weeks
     SET Day_Name = ?, Day_Sphere = ?, Day_Rating = ?
     WHERE Date = ?
     ''', (day_name, day_sphere, day_rating, date_value))
