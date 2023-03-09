@@ -1,7 +1,7 @@
 import sqlite3
 import pandas as pd
 import openpyxl
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from utils.config import dairy_file_path
 
 # Connect to the database
@@ -18,7 +18,7 @@ week_id = 1
 month_id = 1
 season_id = 1
 half_year_id = 1
-year_id = 0
+year_id = 1
 
 # List of day names
 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -29,6 +29,9 @@ season_names = ["winter", "spring", "summer", "autumn"]
 # List of half years
 half_year_names = ['first_half', 'second_half']
 
+start_date = datetime(1986, 1, 3)
+end_date = datetime(2023, 8, 27)
+
 current_date = start_date
 while current_date <= end_date:
     # Determine day of the week name
@@ -37,15 +40,17 @@ while current_date <= end_date:
     # Format date as DD/MM/YYYY
     formatted_date = current_date.strftime('%d/%m/%Y')
 
-    # Calculate week_id
+    # Insert into Weeks table
     if current_date.weekday() == 0:
+        cursor.execute('INSERT INTO Weeks (Week_ID) VALUES (?)', (week_id,))
         week_id += 1
 
-    # Calculate month_id
+    # Insert into Months table
     if current_date.day == 1:
+        cursor.execute('INSERT INTO Months (Month_ID) VALUES (?)', (month_id,))
         month_id += 1
 
-    # Calculate season_id
+    # Calculate and insert into Seasons table
     if current_date.month in [12, 1, 2]:
         season_name = season_names[0]
     elif current_date.month in [3, 4, 5]:
@@ -57,25 +62,34 @@ while current_date <= end_date:
 
     # If the month is December, we consider it as part of the next year's winter
     year_for_season = current_date.year if current_date.month != 12 else current_date.year + 1
-    season_id = f"{season_name}_{year_for_season - 1985}"
+    season_id_str = f"{season_name}_{year_for_season - 1985}"
 
-    # Calculate half_year_id
+    if current_date.month == 1 or (current_date.month == 12 and current_date.day == 1):
+        cursor.execute('INSERT OR IGNORE INTO Seasons (Season_ID, Season_Number) VALUES (?, ?)', (season_id_str, season_id))
+        season_id += 1
+
+    # Calculate and insert into Half_Years table
     if current_date.month <= 6:
         half_year_name = half_year_names[0]
     else:
         half_year_name = half_year_names[1]
 
-    half_year_id = f"{half_year_name}_{current_date.year - 1985}"
+    half_year_id_str = f"{half_year_name}_{current_date.year - 1985}"
 
-    # Calculate year_id
+    if current_date.month == 1 or current_date.month == 7:
+        cursor.execute('INSERT OR IGNORE INTO Half_Years (Half_Year_ID, Half_Year_Number) VALUES (?, ?)', (half_year_id_str, half_year_id ))
+        half_year_id += 1
+
+    # Insert into Years table
     if current_date.month == 1 and current_date.day == 3:
+        cursor.execute('INSERT OR IGNORE INTO Years (Year_ID, Year_Number) VALUES (?, ?)', (year_id, current_date.year))
         year_id += 1
 
     # Insert into the Days table
     cursor.execute('''
     INSERT INTO Days (Day_ID, Date, Day_of_Week, Day_Name, Day_Sphere, Day_Rating, Week_ID, Month_ID, Season_ID, Half_Year_ID, Year_ID)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (day_id, formatted_date, day_of_week, "", "", 0, week_id, month_id, season_id, half_year_id, year_id))
+    ''', (day_id, formatted_date, day_of_week, "", "", 0, week_id, month_id, season_id_str, half_year_id_str, year_id - 1))
 
     # Move to the next day
     current_date += timedelta(days=1)
@@ -86,7 +100,6 @@ conn.commit()
 conn.close()
 
 print("Rows added successfully to the Days table!")
-
 
 # Load the Days Diary xlsx workbook
 workbook = openpyxl.load_workbook(dairy_file_path)
@@ -207,12 +220,31 @@ for _, row in df_weeks.iterrows():
     # Update the SQLite database Days table
     cursor.execute('''
     UPDATE Weeks
-    SET Day_Name = ?, Day_Sphere = ?, Day_Rating = ?
-    WHERE Date = ?
-    ''', (day_name, day_sphere, day_rating, date_value))
+    SET Week_Name = ?, Week_Sphere = ?
+    WHERE Week_ID = ?
+    ''', (week_name, weeks_sphere, id_value))
 
-print('All rows were updated!')
+print('Week rows were updated!')
+
+# Iterate over the rows of the DataFrame
+for _, row in df_months.iterrows():
+    # Extract values from the DataFrame row
+    id_value = row['DATE']
+    month_name = row['EVENT']
+    month_sphere = row['SPHERE']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Months
+    SET Month_Name = ?, Month_Sphere = ?
+    WHERE Month_ID = ?
+    ''', (month_name, month_sphere, id_value))
+
+print('Months rows were updated!')
 
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
+
+
+

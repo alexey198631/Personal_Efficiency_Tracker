@@ -80,7 +80,7 @@ def get_date_id(target_date=date(2023, 12, 31), start_date=date(1986, 1, 3)):
         current_date += timedelta(days=1)
         day_id += 1
 
-    return day_id - 1, formatted_date, day_of_week, week_id, month_id, season_id, half_year_id, year_id\
+    return day_id - 1, formatted_date, day_of_week, week_id, month_id, season_id, half_year_id, year_id
 
 
 
@@ -139,7 +139,7 @@ def get_date_id_simplified(target_date=date(2023, 12, 31), start_date=date(1986,
     return day_id, formatted_date, day_of_week, week_id, month_id, season_id, half_year_id, year_id
 
 
-# Example usage
+# Test Cases
 # start_time = datetime.now()
 # print(get_date_id(target_date=date(2023, 8, 27)))
 # finish_time = datetime.now()

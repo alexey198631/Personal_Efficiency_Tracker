@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS Weeks (
 
 # Create the Month table
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS Month (
+CREATE TABLE IF NOT EXISTS Months (
     Month_ID INTEGER PRIMARY KEY,
     Month_Number INTEGER, 
     Month_Name TEXT,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Month (
 # Create the Seasons table
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Seasons (
-    Season_ID INTEGER PRIMARY KEY,
+    Season_ID TEXT PRIMARY KEY,
     Season_Number TEXT,
     Season_Name TEXT,
     Season_Sphere TEXT
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Seasons (
 # Create the Half_Years table
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Half_Years (
-    Half_Year_ID INTEGER PRIMARY KEY,
+    Half_Year_ID TEXT PRIMARY KEY,
     Half_Year_Number TEXT,
     Half_Year_Name TEXT,
     Half_Year_Sphere TEXT
@@ -205,8 +205,9 @@ CREATE TABLE IF NOT EXISTS Art (
 )
 ''')
 
+
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
 
-print("Tables created successfully in Days.db!")
+print("Tables created successfully in data_files/Days.db!")
