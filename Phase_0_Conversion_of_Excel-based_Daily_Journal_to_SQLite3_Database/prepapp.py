@@ -47,7 +47,7 @@ while current_date <= end_date:
 
     # Insert into Months table
     if current_date.day == 1:
-        cursor.execute('INSERT INTO Months (Month_ID) VALUES (?)', (month_id,))
+        cursor.execute('INSERT INTO Months (Month_ID, Month_Number) VALUES (?, ?)', (month_id, current_date.month, ))
         month_id += 1
 
     # Calculate and insert into Seasons table
@@ -63,22 +63,23 @@ while current_date <= end_date:
     # If the month is December, we consider it as part of the next year's winter
     year_for_season = current_date.year if current_date.month != 12 else current_date.year + 1
     season_id_str = f"{season_name}_{year_for_season - 1985}"
-
-    if current_date.month == 1 or (current_date.month == 12 and current_date.day == 1):
-        cursor.execute('INSERT OR IGNORE INTO Seasons (Season_ID, Season_Number) VALUES (?, ?)', (season_id_str, season_id))
-        season_id += 1
+    cursor.execute('INSERT OR IGNORE INTO Seasons (Season_ID) VALUES (?)', (season_id_str, ))
 
     # Calculate and insert into Half_Years table
     if current_date.month <= 6:
         half_year_name = half_year_names[0]
+        if current_date.month == 6:
+            half_year_id += 1
     else:
         half_year_name = half_year_names[1]
+        if current_date.month == 12:
+            half_year_id += 1
 
     half_year_id_str = f"{half_year_name}_{current_date.year - 1985}"
 
     if current_date.month == 1 or current_date.month == 7:
         cursor.execute('INSERT OR IGNORE INTO Half_Years (Half_Year_ID, Half_Year_Number) VALUES (?, ?)', (half_year_id_str, half_year_id ))
-        half_year_id += 1
+
 
     # Insert into Years table
     if current_date.month == 1 and current_date.day == 3:
@@ -117,7 +118,7 @@ print('Data from Dairy was imported!')
 # To get Day_Name, it is necessary to use type 'D'
 df_day = df_days[df_days['Type'] == 'D'].loc[:, :'SPHERE']
 # filter Days without Name
-df_day = df_day[df_days['EVENT'] != 'День ']
+df_day = df_day[df_day['EVENT'] != 'День ']
 
 print('df for days is ready!')
 
