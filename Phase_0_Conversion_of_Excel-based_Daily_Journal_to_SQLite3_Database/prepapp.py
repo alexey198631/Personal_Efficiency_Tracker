@@ -78,7 +78,7 @@ while current_date <= end_date:
     half_year_id_str = f"{half_year_name}_{current_date.year - 1985}"
 
     if current_date.month == 1 or current_date.month == 7:
-        cursor.execute('INSERT OR IGNORE INTO Half_Years (Half_Year_ID, Half_Year_Number) VALUES (?, ?)', (half_year_id_str, half_year_id ))
+        cursor.execute('INSERT OR IGNORE INTO Half_Years (Half_Year_ID) VALUES (?)', (half_year_id_str,))
 
 
     # Insert into Years table
@@ -242,6 +242,54 @@ for _, row in df_months.iterrows():
     ''', (month_name, month_sphere, id_value))
 
 print('Months rows were updated!')
+
+# Iterate over the rows of the DataFrame
+for _, row in df_seasons.iterrows():
+    # Extract values from the DataFrame row
+    id_value = row['DATE']
+    season_name = row['EVENT']
+    season_sphere = row['SPHERE']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Seasons
+    SET Season_Name = ?, Season_Sphere = ?
+    WHERE Season_ID = ?
+    ''', (season_name, season_sphere, id_value))
+
+print('Seasons rows were updated!')
+
+# Iterate over the rows of the DataFrame
+for _, row in df_half_year.iterrows():
+    # Extract values from the DataFrame row
+    id_value = row['DATE']
+    halfyear_name = row['EVENT']
+    halfyear_sphere = row['SPHERE']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Half_Years
+    SET Half_Year_Name = ?, Half_Year_Sphere = ?
+    WHERE Half_Year_ID = ?
+    ''', (halfyear_name, halfyear_sphere, id_value))
+
+print('Half Year rows were updated!')
+
+# Iterate over the rows of the DataFrame
+for _, row in df_year.iterrows():
+    # Extract values from the DataFrame row
+    id_value = row['DATE']
+    year_name = row['EVENT']
+    year_sphere = row['SPHERE']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Years
+    SET Year_Name = ?, Year_Sphere = ?
+    WHERE Year_ID = ?
+    ''', (year_name, year_sphere, id_value))
+
+print('Years rows were updated!')
 
 # Commit the changes and close the connection
 conn.commit()

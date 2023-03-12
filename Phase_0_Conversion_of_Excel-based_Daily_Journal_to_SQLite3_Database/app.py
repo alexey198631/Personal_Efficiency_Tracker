@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS Months (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Seasons (
     Season_ID TEXT PRIMARY KEY,
-    Season_Number TEXT,
     Season_Name TEXT,
     Season_Sphere TEXT
 )
@@ -54,7 +53,6 @@ CREATE TABLE IF NOT EXISTS Seasons (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Half_Years (
     Half_Year_ID TEXT PRIMARY KEY,
-    Half_Year_Number TEXT,
     Half_Year_Name TEXT,
     Half_Year_Sphere TEXT
 )
