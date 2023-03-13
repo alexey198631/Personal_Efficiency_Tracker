@@ -13,12 +13,23 @@ CREATE TABLE IF NOT EXISTS Days (
     Day_Name TEXT,
     Day_Sphere TEXT,
     Day_Rating INTEGER,
+    Night_ID INTEGER,
     Week_ID INTEGER,
     Month_ID INTEGER,
     Season_ID INTEGER,
     Half_Year_ID INTEGER,
     Year_ID INTEGER
 )
+''')
+
+# Create the Night Dreams table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Dreams (
+    Night_ID INTEGER PRIMARY KEY,
+    Night DATE,
+    Night_Name TEXT,
+    Night_Sphere TEXT
+    )
 ''')
 
 # Create the Weeks table

@@ -14,6 +14,7 @@ end_date = date(2023, 12, 31)
 
 # Initial values
 day_id = 1
+#night_id = 1
 week_id = 1
 month_id = 1
 season_id = 1
@@ -39,6 +40,8 @@ while current_date <= end_date:
 
     # Format date as DD/MM/YYYY
     formatted_date = current_date.strftime('%d/%m/%Y')
+
+    night_id = day_id
 
     # Insert into Weeks table
     if current_date.weekday() == 0:
@@ -88,9 +91,9 @@ while current_date <= end_date:
 
     # Insert into the Days table
     cursor.execute('''
-    INSERT INTO Days (Day_ID, Date, Day_of_Week, Day_Name, Day_Sphere, Day_Rating, Week_ID, Month_ID, Season_ID, Half_Year_ID, Year_ID)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (day_id, formatted_date, day_of_week, "", "", 0, week_id, month_id, season_id_str, half_year_id_str, year_id - 1))
+    INSERT INTO Days (Day_ID, Date, Day_of_Week, Day_Name, Day_Sphere, Day_Rating, Night_ID, Week_ID, Month_ID, Season_ID, Half_Year_ID, Year_ID)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (day_id, formatted_date, day_of_week, "", "", 0, night_id, week_id, month_id, season_id_str, half_year_id_str, year_id - 1))
 
     # Move to the next day
     current_date += timedelta(days=1)
@@ -121,6 +124,13 @@ df_day = df_days[df_days['Type'] == 'D'].loc[:, :'SPHERE']
 df_day = df_day[df_day['EVENT'] != 'День ']
 
 print('df for days is ready!')
+
+# To get Night_Name, it is necessary to use type 'D'
+df_night = df_days[df_days['Type'] == 'N'].loc[:, :'SPHERE']
+# filter Nights without Name
+df_night = df_night[df_night['EVENT'] != 'Ночь ']
+
+print('df for nights is ready!')
 
 # To get Week_Name, it is necessary to use type 'W'
 df_weeks = df_days[df_days['Type'] == 'W'].loc[:, :'SPHERE']
@@ -210,6 +220,22 @@ for _, row in df_day.iterrows():
     ''', (day_name, day_sphere, day_rating, date_value))
 
 print('Days rows were updated!')
+
+# Iterate over the rows of the DataFrame
+for _, row in df_night.iterrows():
+    # Extract values from the DataFrame row
+    id_value = row['DATE']
+    night_name = row['EVENT']
+    night_sphere = row['SPHERE']
+
+    # Update the SQLite database Days table
+    cursor.execute('''
+    UPDATE Dreams
+    SET Night_Name = ?, Night_Sphere = ?
+    WHERE Night_ID = ?
+    ''', (night_name, night_sphere, id_value))
+
+print('Nights rows were updated!')
 
 # Iterate over the rows of the DataFrame
 for _, row in df_weeks.iterrows():
