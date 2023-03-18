@@ -43,6 +43,9 @@ while current_date <= end_date:
 
     night_id = day_id
 
+    # insert into Dreams table
+    cursor.execute('INSERT OR IGNORE INTO Dreams (Night_ID, Date) VALUES (?, ?)', (night_id, formatted_date))
+
     # Insert into Weeks table
     if current_date.weekday() == 0:
         cursor.execute('INSERT INTO Weeks (Week_ID) VALUES (?)', (week_id,))

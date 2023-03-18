@@ -22,15 +22,17 @@ CREATE TABLE IF NOT EXISTS Days (
 )
 ''')
 
+
 # Create the Night Dreams table
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Dreams (
     Night_ID INTEGER PRIMARY KEY,
-    Night DATE,
+    Date DATE,
     Night_Name TEXT,
     Night_Sphere TEXT
     )
 ''')
+
 
 # Create the Weeks table
 cursor.execute('''
