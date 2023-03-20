@@ -227,7 +227,8 @@ print('Days rows were updated!')
 # Iterate over the rows of the DataFrame
 for _, row in df_night.iterrows():
     # Extract values from the DataFrame row
-    id_value = row['DATE']
+    date_value = row['DATE']
+    date_value = date_value.strftime('%d/%m/%Y')
     night_name = row['EVENT']
     night_sphere = row['SPHERE']
 
@@ -235,7 +236,7 @@ for _, row in df_night.iterrows():
     cursor.execute('''
     UPDATE Dreams
     SET Night_Name = ?, Night_Sphere = ?
-    WHERE Night_ID = ?
+    WHERE Date = ?
     ''', (night_name, night_sphere, id_value))
 
 print('Nights rows were updated!')
