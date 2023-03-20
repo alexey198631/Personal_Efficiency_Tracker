@@ -237,7 +237,7 @@ for _, row in df_night.iterrows():
     UPDATE Dreams
     SET Night_Name = ?, Night_Sphere = ?
     WHERE Date = ?
-    ''', (night_name, night_sphere, id_value))
+    ''', (night_name, night_sphere, date_value))
 
 print('Nights rows were updated!')
 
