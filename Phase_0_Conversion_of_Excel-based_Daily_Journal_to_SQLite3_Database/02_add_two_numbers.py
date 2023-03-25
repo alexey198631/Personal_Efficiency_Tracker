@@ -12,16 +12,24 @@ You may assume the two numbers do not contain any leading zero, except the numbe
 #         self.val = val
 #         self.next = next
 class Solution:
-    def addTwoNumbers(self, l1, l2):
-        l1.reverse()
-        l2.reverse()
-        l1 = [str(item) for item in l1]
-        l2 = [str(item) for item in l2]
-        num1 = ''.join(l1)
-        num2 = ''.join(l2)
-        sm = int(num1) + int(num2)
-        sm = list(str(sm))
-        sm = [int(item) for item in sm]
-        sm.reverse()
+    class Solution:
+        def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+            dummy_head = ListNode(0)
+            current = dummy_head
+            carry = 0
+            while l1 or l2 or carry:
+                total_sum = carry
+                if l1:
+                    total_sum += l1.val
+                    l1 = l1.next
+                if l2:
+                    total_sum += l2.val
+                    l2 = l2.next
 
-        return sm
+                carry = total_sum // 10
+
+                current.next = ListNode(total_sum % 10)
+
+                current = current.next
+
+            return dummy_head.next
