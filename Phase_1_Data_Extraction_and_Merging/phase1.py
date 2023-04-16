@@ -10,9 +10,47 @@ gbook = config.GBOOK
 glist = config.GSHEET
 elist = config.ELIST
 
-gc = gspread.service_account(filename)
+# Prepare data frame for Excel workbook sheet
+def df_from_sheet(wkb, sht_name):
+    # Select the sheet you want to modify
+    sheet = wkb[sht_name]
 
-# Open a sheet from a spreadsheet in one go
+    # Save data frame from sheet data
+    data_days = sheet.values
+    cols = next(data_days)[0:]
+    df = pd.DataFrame(data_days, columns=cols)
+    return df
+
+
+# Write the updated DataFrame to the worksheet with the same format
+def same_format_sheet(wkb, sht, df):
+    # Create a new worksheet with the same formatting as the existing worksheet
+    new_worksheet = wkb.create_sheet('Temp')
+    new_worksheet.sheet_format = sht.sheet_format
+    new_worksheet.sheet_properties = sht.sheet_properties
+    new_worksheet.page_setup = sht.page_setup
+
+    # Write the updated DataFrame to the worksheet
+    for r in dataframe_to_rows(df, index=False, header=True):
+        new_worksheet.append(r)
+
+    # Delete all existing rows in the worksheet
+    sht.delete_rows(1, sht.max_row)
+    for row in new_worksheet.iter_rows():
+        sht.append([cell.value for cell in row])
+
+    # Delete the temporary worksheet
+    wkb.remove(new_worksheet)
+
+    # Save the changes to the Excel file
+    wkb.save(dairy_file)
+
+    # Close the workbook
+    wkb.close()
+
+
+# Open a Google sheet
+gc = gspread.service_account(filename)
 spr = gc.open(gbook).worksheet(glist)
 
 # Get all the data from the sheet as a list of lists
@@ -28,13 +66,10 @@ df_google = df_google.loc[:last_index, :]
 # Load the Days Diary xlsx workbook
 workbook = openpyxl.load_workbook(dairy_file)
 
-# Select the sheet you want to modify
-sheet = workbook[elist]
-
-# Save data frame from sheet data
-data_days = sheet.values
-cols = next(data_days)[0:]
-df_days = pd.DataFrame(data_days, columns=cols)
+# Create Data Frame from Excel file
+df_days = df_from_sheet(workbook, elist)
+# Save columns to a list
+cols = list(df_days.columns)
 
 # Rename all columns which have different name because in Google Sheet file modified names are being used
 col_names_correct = {}
@@ -57,29 +92,21 @@ for col in df_google.columns:
     else:
         df_google[col] = df_google[col].astype(col_dtype)
 
+# Write the updated DataFrame to the worksheet with the same format
+same_format_sheet(workbook, workbook[elist], df_google)
 
-# Create a new worksheet with the same formatting as the existing worksheet
-new_worksheet = workbook.create_sheet('Temp')
-new_worksheet.sheet_format = sheet.sheet_format
-new_worksheet.sheet_properties = sheet.sheet_properties
-new_worksheet.page_setup = sheet.page_setup
+# Prepare reference Sheet for Phase 2
+weeks_df = df_from_sheet(workbook, 'week')
 
-# Write the updated DataFrame to the worksheet
-for r in dataframe_to_rows(df_google, index=False, header=True):
-    new_worksheet.append(r)
+# Filter rows which exists in df from Google
+weeks_df['InBoth'] = weeks_df['DATE'].isin(df_google['DATE']).astype(int)
 
-# Delete all existing rows in the worksheet
-sheet.delete_rows(1, sheet.max_row)
-for row in new_worksheet.iter_rows():
-    sheet.append([cell.value for cell in row])
+# Fill in columns in df for dates that are present in both dataframes
+weeks_df.loc[weeks_df['InBoth'] == 1, 'WEEK#'] = weeks_df.loc[weeks_df['InBoth'] == 1, 'WEEK#T']
+weeks_df.loc[weeks_df['InBoth'] == 1, 'MONTH#'] = weeks_df.loc[weeks_df['InBoth'] == 1, 'MONTH#T']
 
-# Delete the temporary worksheet
-workbook.remove(new_worksheet)
+# Drop the 'InBoth' column
+weeks_df = weeks_df.drop('InBoth', axis=1)
 
-# Save the changes to the Excel file
-workbook.save(dairy_file)
-
-# Close the workbook
-workbook.close()
-
-
+# Write the updated DataFrame to the worksheet with the same format
+same_format_sheet(workbook, workbook['week'], weeks_df)
