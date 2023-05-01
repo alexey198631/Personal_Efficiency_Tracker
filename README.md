@@ -18,3 +18,16 @@ In the first phase of the project, we will focus on:
 - Ensuring data consistency and handling any missing or irregular data points.
 - Saving the combined dataset for further analysis in the subsequent stages of the project.
 - This phase will lay the foundation for the rest of the project by consolidating all available data in one place, setting the stage for advanced data analysis, visualization, and personal efficiency tracking.
+
+## Phase 2: Days Diary xlsx generation
+
+Columns: TYPE, DATE, EVENT, POINTS, M, HY, Y, S, SPHERE
+Types of rows: "D", "E", "N" for each DATE in an Year, "W", "WE" x 3, "WN" for each WEEK
+               "ME" x 5, "NM" x 5, "M" for each MONTH
+               "SE" x 5, "S" for each SEASON
+               "HYE" x 7, "NHY", "HY" for each HALF-YEAR
+               "YE" x 10, "Y" at the end of YEAR
+
+Current year naming: "D" from 01/01/2023, "W" from "Неделя 1931" started in December 2022,
+                  "S" from "38 зима", "M" from "38 январь (445)"
+                  "HY" from "38 полулетие 1", "Y": "38 летие"
