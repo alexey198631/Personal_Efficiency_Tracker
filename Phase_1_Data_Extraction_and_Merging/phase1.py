@@ -110,3 +110,36 @@ weeks_df = weeks_df.drop('InBoth', axis=1)
 
 # Write the updated DataFrame to the worksheet with the same format
 same_format_sheet(workbook, workbook['week'], weeks_df)
+
+gtiming = config.TIMINGBOOK
+gart = config.ARTBOOK
+gday = config.DAYBOOK
+gweek = config.WEEKBOOK
+gmonth = config.MONTHBOOK
+
+def sheet_to_df(sheet_var):
+    # Open a Google sheet
+    spr = gc.open(gbook).worksheet(sheet_var)
+    # Get all the data from the sheet as a list of lists
+    data = spr.get_all_values()
+    # Convert the data to a pandas dataframe
+    df_google = pd.DataFrame(data[1:], columns=data[0])
+    return df_google
+
+
+
+
+days = sheet_to_df(gday)
+weeks = sheet_to_df(gweek)
+months = sheet_to_df(gmonth)
+art = sheet_to_df(gart)
+
+# Define an integer format string
+number_format = '#,##0.00'
+
+writer = pd.ExcelWriter('data_files/month.xlsx', engine='xlsxwriter')
+days.to_excel(writer, sheet_name='Sheet1', index=False, float_format=number_format)
+weeks.to_excel(writer, sheet_name='Sheet2', index=False, float_format=number_format)
+months.to_excel(writer, sheet_name='Sheet3', index=False, float_format=number_format)
+art.to_excel(writer, sheet_name='Sheet4', index=False, float_format=number_format)
+writer.save()
