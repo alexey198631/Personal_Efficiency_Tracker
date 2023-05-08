@@ -142,4 +142,4 @@ days.to_excel(writer, sheet_name='Sheet1', index=False, float_format=number_form
 weeks.to_excel(writer, sheet_name='Sheet2', index=False, float_format=number_format)
 months.to_excel(writer, sheet_name='Sheet3', index=False, float_format=number_format)
 art.to_excel(writer, sheet_name='Sheet4', index=False, float_format=number_format)
-writer.save()
+writer.close()
