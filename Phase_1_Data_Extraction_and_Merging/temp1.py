@@ -79,7 +79,7 @@ df = sheet_to_df(gtiming)
 number_format = '#,##0.00'
 
 #writer = pd.ExcelWriter('data_files/timing.xlsx', engine='xlsxwriter')
-#timing.to_excel(writer, sheet_name='Timing', index=False, float_format=number_format)
+#df.to_excel(writer, sheet_name='Timing', index=False, float_format=number_format)
 #days.to_excel(writer, sheet_name='Days', index=False, float_format=number_format)
 #weeks.to_excel(writer, sheet_name='Weeks', index=False, float_format=number_format)
 #months.to_excel(writer, sheet_name='Months', index=False, float_format=number_format)
@@ -130,7 +130,6 @@ df_cleaned = df[['DATE', 'START', 'FINISH', 'DURATION', 'TYPE', 'DIRECTION', 'EV
        'WATER', 'GOALS', 'DUMBBELLS', 'FASTFOOD', 'SWEETS', 'BEER', 'WINE',
        'COCTAIL', 'VODKA', 'WHISKY', 'BRANDY', 'COFFEE', 'ART', 'YEAR', 'SIZE',
        'CREATOR', 'WHERE', 'COUNTRY', 'PTS', 'COMMENTS', 'TYPE.1']]
-
 
 
 df_cleaned[['WALK', 'RUN',
@@ -190,15 +189,21 @@ column_types = {
 }
 
 
-
 # Drop rows where the first column (column 'A' in this example) is NaN.
 df_cleaned = df_cleaned.dropna(subset=['DURATION'])
 df_cleaned = change_column_types(df_cleaned, column_types)
 
+
 # Replace empty strings with NaN in the 'Event' column
-df_cleaned['WALK'].replace('', np.nan, inplace=True)
-df_cleaned['RUN'].replace('', np.nan, inplace=True)
-df_cleaned['CYCLE'].replace('', np.nan, inplace=True)
+#df_cleaned.loc[:, 'WALK'] = df_cleaned['WALK'].replace('', np.nan)
+#df_cleaned.loc[:, 'RUN'] = df_cleaned['RUN'].replace('', np.nan)
+#df_cleaned.loc[:, 'CYCLE'] = df_cleaned['CYCLE'].replace('', np.nan)
+
+# Replace empty strings with NaN and convert to float
+df_cleaned.loc[:, 'WALK'] = pd.to_numeric(df_cleaned['WALK'].replace('', np.nan), errors='coerce')
+df_cleaned.loc[:, 'RUN'] = pd.to_numeric(df_cleaned['RUN'].replace('', np.nan), errors='coerce')
+df_cleaned.loc[:, 'CYCLE'] = pd.to_numeric(df_cleaned['CYCLE'].replace('', np.nan), errors='coerce')
+
 
 df_cleaned[['PUSH_UPS', 'PULL_UPS', 'SKID', 'SQUATING', 'ABS', 'PLANK',
        'WATER', 'GOALS', 'DUMBBELLS', 'FASTFOOD', 'SWEETS', 'BEER', 'WINE',
@@ -227,8 +232,8 @@ df_for_art['AWARD'] = 0
 df_for_art['TIMES'] = 1
 
 # Replace empty strings with NaN in the 'Event' column
-df_for_art['NAME'].replace('', np.nan, inplace=True)
-df_for_art['TYPE'].replace('', np.nan, inplace=True)
+df_for_art.loc[:, 'NAME'] = df_for_art['NAME'].replace('', np.nan)
+df_for_art.loc[:, 'TYPE'] = df_for_art['TYPE'].replace('', np.nan)
 
 # Drop rows where the first column (column 'ART', 'YEAR' in this example) is NaN.
 df_art = df_for_art.dropna(subset=['NAME'])
@@ -243,7 +248,8 @@ arts = df_art['NAME'].to_list()
 
 # Drop rows where the first column (column 'A' in this example) is NaN.
 tempdf = df_cleaned.copy()
-tempdf['ART'].replace('', np.nan, inplace=True)
+tempdf.loc[:, 'ART'] = tempdf['ART'].replace('', np.nan)
+
 df_art_started = tempdf.dropna(subset=['ART'])
 df_art_started = df_art_started.drop('TYPE', axis=1)
 
@@ -363,7 +369,8 @@ clean_writing_pivot = clean_writing_df.pivot_table(
     columns=['LANG TYPE'],
     values='DURATION',
     aggfunc='sum',
-    fill_value=0
+    fill_value=0,
+    observed=True
 )
 
 clean_writing_pivot.reset_index(inplace=True)
@@ -595,7 +602,6 @@ df_merged = df_merged[
      'Y_FEATS', 'Y_PRIOR',
      'Y_PLANS']]
 
-print(df_merged.columns)
 
 # Renaming the column 'oldName1' to 'newName1'
 df_final = df_merged.rename(
@@ -770,10 +776,16 @@ weights_s = {
 normalization_factor = 100 / (15 * 5)
 
 # Apply weights to each column and calculate the score
-df_priors_final['SCORE'] = sum(
-    df_priors_final[col] * weight * normalization_factor for col, weight in weights_p.items())
-df_priors_final['SCORE_S'] = sum(
-    df_priors_final[col] * weight * normalization_factor for col, weight in weights_s.items())
+# Calculate SCORE
+df_priors_final.loc[:, 'SCORE'] = sum(
+    df_priors_final[col] * weight * normalization_factor for col, weight in weights_p.items()
+)
+
+df_priors_final.loc[:, 'SCORE_S'] = sum(
+    df_priors_final[col] * weight * normalization_factor for col, weight in weights_s.items()
+)
+
+
 
 df_p_m = df_priors_final.copy()
 
@@ -802,7 +814,17 @@ df_month['month_year'] = df_month['DATE'].dt.to_period('M')
 
 df_month.drop(columns=['DATE'], inplace=True)
 
-df_month_pivot = df_month.pivot_table(index='month_year', aggfunc='sum')
+
+writer = pd.ExcelWriter('data_files/df_month.xlsx', engine='xlsxwriter')
+df_month.to_excel(writer, sheet_name='df_month')
+writer.close()
+
+#######
+
+#df_month_pivot = df_month.pivot_table(index='month_year', aggfunc='sum')
+
+
+
 
 # weeks results
 
@@ -815,17 +837,17 @@ df_weeks['DATE'] = pd.to_datetime(df_weeks['DATE'],format='%d.%m.%Y')
 df_weeks.set_index('DATE', inplace=True)
 
 # Resample data by week and aggregate
-weekly_data = df_weeks.resample('W').sum()
+#weekly_data = df_weeks.resample('W').sum()
 
 #2023 without the partial 1st week
-weekly_data = weekly_data.iloc[1:]
-max_values = weekly_data.max()
+#weekly_data = weekly_data.iloc[1:]
+#max_values = weekly_data.max()
 
 #2024 only
-weekly_data_2024 = weekly_data.iloc[52:]
-max_values_2024 = weekly_data_2024.max()
+#weekly_data_2024 = weekly_data.iloc[52:]
+#max_values_2024 = weekly_data_2024.max()
 
-last_row = weekly_data.iloc[-1]
+#last_row = weekly_data.iloc[-1]
 
 
 new_column_order = separate_timing + imposed_timing + additional +  yes_no + times + negative + quantities + distance + sport_additional + typ_lang_eng + typ_lang_rus + typ_lang_spa + typ_lang_dut + sum_languages
@@ -833,8 +855,8 @@ new_column_order = separate_timing + imposed_timing + additional +  yes_no + tim
 new_column_order_final = ['DATE'] + new_column_order + ['START', 'FINISH']
 
 df_final = df_final[new_column_order_final]
-df_month_pivot = df_month_pivot[new_column_order]
-weekly_data = weekly_data[new_column_order]
+#df_month_pivot = df_month_pivot[new_column_order]
+#weekly_data = weekly_data[new_column_order]
 
 
 last_row = df.iloc[-1]
@@ -866,16 +888,16 @@ df['DATE'] = pd.to_datetime(df['DATE'], format='%d.%m.%Y')
 
 df_final = df_final.sort_values(by='DATE', ascending=False)
 df_priors_final = df_priors_final.sort_values(by='DATE', ascending=False)
-df_month_pivot = df_month_pivot.sort_values(by='month_year', ascending=False)
-weekly_data= weekly_data.sort_values(by='DATE', ascending=False)
+#df_month_pivot = df_month_pivot.sort_values(by='month_year', ascending=False)
+#weekly_data= weekly_data.sort_values(by='DATE', ascending=False)
 df_p_m  = df_p_m.sort_values(by='month_year', ascending=False)
 weekly_data_p= weekly_data_p.sort_values(by='DATE', ascending=False)
 df = df.sort_values(by='DATE', ascending=False)
 
 writer = pd.ExcelWriter('data_files/days_stat.xlsx')
 df_final.to_excel(writer, sheet_name='days', index=False)
-df_month_pivot.to_excel(writer, sheet_name='months')
-weekly_data.to_excel(writer, sheet_name='weeks')
+#df_month_pivot.to_excel(writer, sheet_name='months')
+#weekly_data.to_excel(writer, sheet_name='weeks')
 df_priors_final.to_excel(writer, sheet_name='priors', index=False)
 df_p_m.to_excel(writer, sheet_name='priors_months')
 weekly_data_p.to_excel(writer, sheet_name='priors_weeks')
