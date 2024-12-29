@@ -799,6 +799,9 @@ df_month = df_final.copy()
 
 df_month['DATE'] = pd.to_datetime(df_month['DATE'],format='%d.%m.%Y')
 df_month['month_year'] = df_month['DATE'].dt.to_period('M')
+
+df_month.drop(columns=['DATE'], inplace=True)
+
 df_month_pivot = df_month.pivot_table(index='month_year', aggfunc='sum')
 
 # weeks results
