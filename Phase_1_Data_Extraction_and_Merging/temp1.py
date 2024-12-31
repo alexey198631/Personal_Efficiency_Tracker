@@ -195,14 +195,14 @@ df_cleaned = change_column_types(df_cleaned, column_types)
 
 
 # Replace empty strings with NaN in the 'Event' column
-#df_cleaned.loc[:, 'WALK'] = df_cleaned['WALK'].replace('', np.nan)
-#df_cleaned.loc[:, 'RUN'] = df_cleaned['RUN'].replace('', np.nan)
-#df_cleaned.loc[:, 'CYCLE'] = df_cleaned['CYCLE'].replace('', np.nan)
+df_cleaned.loc[:, 'WALK'] = df_cleaned['WALK'].replace('', np.nan)
+df_cleaned.loc[:, 'RUN'] = df_cleaned['RUN'].replace('', np.nan)
+df_cleaned.loc[:, 'CYCLE'] = df_cleaned['CYCLE'].replace('', np.nan)
 
 # Replace empty strings with NaN and convert to float
-df_cleaned.loc[:, 'WALK'] = pd.to_numeric(df_cleaned['WALK'].replace('', np.nan), errors='coerce')
-df_cleaned.loc[:, 'RUN'] = pd.to_numeric(df_cleaned['RUN'].replace('', np.nan), errors='coerce')
-df_cleaned.loc[:, 'CYCLE'] = pd.to_numeric(df_cleaned['CYCLE'].replace('', np.nan), errors='coerce')
+#df_cleaned.loc[:, 'WALK'] = pd.to_numeric(df_cleaned['WALK'].replace('', np.nan), errors='coerce')
+#df_cleaned.loc[:, 'RUN'] = pd.to_numeric(df_cleaned['RUN'].replace('', np.nan), errors='coerce')
+#df_cleaned.loc[:, 'CYCLE'] = pd.to_numeric(df_cleaned['CYCLE'].replace('', np.nan), errors='coerce')
 
 
 df_cleaned[['PUSH_UPS', 'PULL_UPS', 'SKID', 'SQUATING', 'ABS', 'PLANK',
